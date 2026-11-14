@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Todo
+Comment=Simple todo app
+Exec=/usr/bin/todoapp
+Icon=todoapp
