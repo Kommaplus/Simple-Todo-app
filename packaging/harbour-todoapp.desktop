@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Todo
+Comment=Simple todo app
+Exec=sailfish-qml harbour-todoapp
+Icon=harbour-todoapp
+X-Nemo-Application-Type=silica-qt5
+
+[X-Sailjail]
+OrganizationName=io.github.kommaplus
+ApplicationName=TodoApp
