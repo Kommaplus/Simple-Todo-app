@@ -2,8 +2,9 @@
 Type=Application
 Name=Todo
 Comment=Simple todo app
-Exec=/usr/bin/todoapp
+Exec=/usr/bin/invoker --type=silica-qt5 --id=todoapp -- /usr/bin/sailfish-qml todoapp
 Icon=todoapp
+X-Nemo-Application-Type=silica-qt5
 
 [X-Sailjail]
 Sandboxing=Disabled
