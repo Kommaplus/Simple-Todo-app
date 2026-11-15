@@ -1,0 +1,53 @@
+name: Build RPM
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install rpmbuild
+        run: sudo apt-get update && sudo apt-get install -y rpm rsync
+
+      - name: Stage sources and build RPM
+        run: |
+          VERSION=0.1
+          mkdir -p rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SOURCES rpmbuild/SPECS rpmbuild/SRPMS
+          mkdir -p stage/todoapp-${VERSION}/qml
+          rsync -a --exclude='*.bak*' qml/ stage/todoapp-${VERSION}/qml/
+          cp todoapp.png stage/todoapp-${VERSION}/
+          cp packaging/todoapp.desktop stage/todoapp-${VERSION}/
+          cp packaging/todoapp-wrapper stage/todoapp-${VERSION}/todoapp
+          cp rpm/todoapp.spec rpmbuild/SPECS/
+          tar -czf rpmbuild/SOURCES/todoapp-${VERSION}.tar.gz -C stage todoapp-${VERSION}
+          rpmbuild -bb --define "_topdir ${PWD}/rpmbuild" rpmbuild/SPECS/todoapp.spec
+          cp rpmbuild/RPMS/noarch/*.rpm .
+          ls -l todoapp-*.rpm
+
+      - name: Upload RPM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: todoapp-rpm
+          path: todoapp-*.rpm
+
+      - name: Publish to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v0.1 --title "Todo v0.1" --notes "Installerbar .rpm-pakke til Sailfish OS.
+
+          Overfør .rpm-filen til telefonen og installér i terminalen:
+
+              devel-su pkcon install-local todoapp-0.1-1.noarch.rpm
+
+          (eller åbn .rpm-filen fra Fil-appen)" todoapp-*.rpm \
+            || gh release upload v0.1 todoapp-*.rpm --clobber
