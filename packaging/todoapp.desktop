@@ -4,3 +4,6 @@ Name=Todo
 Comment=Simple todo app
 Exec=/usr/bin/todoapp
 Icon=todoapp
+
+[X-Sailjail]
+Sandboxing=Disabled
