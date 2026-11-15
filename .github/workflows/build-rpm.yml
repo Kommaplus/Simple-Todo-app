@@ -18,6 +18,16 @@ jobs:
       - name: Install build tools
         run: sudo apt-get update && sudo apt-get install -y rpm rsync imagemagick
 
+      - name: Prepare store assets
+        run: |
+          convert todoapp.png -resize 172x172! store-icon-172.png
+          convert todoapp.png -resize 512x512! store-icon-512.png
+          for f in *.png; do
+            case "$f" in todoapp.png|store-icon-172.png|store-icon-512.png) continue;; esac
+            convert "$f" -resize 1080x1920^ -gravity center -extent 1080x1920 "store-screenshot-$f"
+          done
+          ls -l store-*.png
+
       - name: Stage sources and build RPM
         run: |
           VERSION=0.2
@@ -45,9 +55,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v0.2 --title "Todo v0.2 (Harbour-ready)" --notes "Harbour-klar .rpm-pakke til Sailfish OS.
-
-          Installér i terminalen:
-
-              devel-su pkcon install-local harbour-todoapp-0.2-1.noarch.rpm" harbour-todoapp-*.rpm \
-            || gh release upload v0.2 harbour-todoapp-*.rpm --clobber
+          gh release create v0.2 --title "Todo v0.2 (Harbour-ready)" --notes "Harbour-klar .rpm-pakke til Sailfish OS." harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-screenshot-*.png \
+            || gh release upload v0.2 harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-screenshot-*.png --clobber
