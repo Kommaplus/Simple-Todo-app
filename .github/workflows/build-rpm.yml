@@ -23,7 +23,7 @@ jobs:
           convert todoapp.png -resize 172x172! store-icon-172.png
           convert todoapp.png -resize 512x512! store-icon-512.png
           BG=$(convert todoapp.png -resize 1x1! -format '%[pixel:p{0,0}]' info:)
-          convert -size 1024x512 xc:"$BG" \
+          convert -size 1080x540 xc:"$BG" \
             \( todoapp.png -resize 300x300! \) -gravity north -geometry +0+30 -composite \
             -font DejaVu-Sans -pointsize 80 -fill white -gravity south -annotate +0+20 'Todo' \
             store-cover.png
