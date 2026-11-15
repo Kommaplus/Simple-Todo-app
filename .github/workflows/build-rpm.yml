@@ -15,39 +15,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install rpmbuild
-        run: sudo apt-get update && sudo apt-get install -y rpm rsync
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y rpm rsync imagemagick
 
       - name: Stage sources and build RPM
         run: |
-          VERSION=0.1
+          VERSION=0.2
           mkdir -p rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SOURCES rpmbuild/SPECS rpmbuild/SRPMS
-          mkdir -p stage/todoapp-${VERSION}/qml
-          rsync -a --exclude='*.bak*' qml/ stage/todoapp-${VERSION}/qml/
-          cp todoapp.png stage/todoapp-${VERSION}/
-          cp packaging/todoapp.desktop stage/todoapp-${VERSION}/
-          cp packaging/todoapp-wrapper stage/todoapp-${VERSION}/todoapp
-          cp rpm/todoapp.spec rpmbuild/SPECS/
-          tar -czf rpmbuild/SOURCES/todoapp-${VERSION}.tar.gz -C stage todoapp-${VERSION}
-          rpmbuild -bb --define "_topdir ${PWD}/rpmbuild" rpmbuild/SPECS/todoapp.spec
+          mkdir -p stage/harbour-todoapp-${VERSION}/qml stage/harbour-todoapp-${VERSION}/icons
+          rsync -a --exclude='*.bak*' qml/ stage/harbour-todoapp-${VERSION}/qml/
+          cp packaging/harbour-todoapp.desktop stage/harbour-todoapp-${VERSION}/
+          convert todoapp.png -resize 86x86! stage/harbour-todoapp-${VERSION}/icons/harbour-todoapp-86.png
+          convert todoapp.png -resize 108x108! stage/harbour-todoapp-${VERSION}/icons/harbour-todoapp-108.png
+          convert todoapp.png -resize 128x128! stage/harbour-todoapp-${VERSION}/icons/harbour-todoapp-128.png
+          convert todoapp.png -resize 172x172! stage/harbour-todoapp-${VERSION}/icons/harbour-todoapp-172.png
+          cp rpm/harbour-todoapp.spec rpmbuild/SPECS/
+          tar -czf rpmbuild/SOURCES/harbour-todoapp-${VERSION}.tar.gz -C stage harbour-todoapp-${VERSION}
+          rpmbuild -bb --define "_topdir ${PWD}/rpmbuild" rpmbuild/SPECS/harbour-todoapp.spec
           cp rpmbuild/RPMS/noarch/*.rpm .
-          ls -l todoapp-*.rpm
+          ls -l harbour-todoapp-*.rpm
 
       - name: Upload RPM as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: todoapp-rpm
-          path: todoapp-*.rpm
+          name: harbour-todoapp-rpm
+          path: harbour-todoapp-*.rpm
 
       - name: Publish to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v0.1 --title "Todo v0.1" --notes "Installerbar .rpm-pakke til Sailfish OS.
+          gh release create v0.2 --title "Todo v0.2 (Harbour-ready)" --notes "Harbour-klar .rpm-pakke til Sailfish OS.
 
-          Overfør .rpm-filen til telefonen og installér i terminalen:
+          Installér i terminalen:
 
-              devel-su pkcon install-local todoapp-0.1-1.noarch.rpm
-
-          (eller åbn .rpm-filen fra Fil-appen)" todoapp-*.rpm \
-            || gh release upload v0.1 todoapp-*.rpm --clobber
+              devel-su pkcon install-local harbour-todoapp-0.2-1.noarch.rpm" harbour-todoapp-*.rpm \
+            || gh release upload v0.2 harbour-todoapp-*.rpm --clobber
