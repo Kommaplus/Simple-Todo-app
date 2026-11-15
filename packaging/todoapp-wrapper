@@ -1,0 +1,3 @@
+#!/bin/sh
+# Launches the Todo app with qmlscene from its installed location.
+exec /usr/bin/qmlscene /usr/share/todoapp/qml/TodoMain.qml
