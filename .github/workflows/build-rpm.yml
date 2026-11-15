@@ -16,14 +16,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y rpm rsync imagemagick
+        run: sudo apt-get update && sudo apt-get install -y rpm rsync imagemagick fonts-dejavu-core
 
       - name: Prepare store assets
         run: |
           convert todoapp.png -resize 172x172! store-icon-172.png
           convert todoapp.png -resize 512x512! store-icon-512.png
+          BG=$(convert todoapp.png -resize 1x1! -format '%[pixel:p{0,0}]' info:)
+          convert -size 1024x512 xc:"$BG" \
+            \( todoapp.png -resize 300x300! \) -gravity north -geometry +0+30 -composite \
+            -font DejaVu-Sans -pointsize 80 -fill white -gravity south -annotate +0+20 'Todo' \
+            store-cover.png
           for f in *.png; do
-            case "$f" in todoapp.png|store-icon-172.png|store-icon-512.png) continue;; esac
+            case "$f" in todoapp.png|store-icon-172.png|store-icon-512.png|store-cover.png) continue;; esac
             convert "$f" -resize 1080x1920^ -gravity center -extent 1080x1920 "store-screenshot-$f"
           done
           ls -l store-*.png
@@ -55,5 +60,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v0.2 --title "Todo v0.2 (Harbour-ready)" --notes "Harbour-klar .rpm-pakke til Sailfish OS." harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-screenshot-*.png \
-            || gh release upload v0.2 harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-screenshot-*.png --clobber
+          gh release create v0.2 --title "Todo v0.2 (Harbour-ready)" --notes "Harbour-klar .rpm-pakke til Sailfish OS." harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-cover.png store-screenshot-*.png \
+            || gh release upload v0.2 harbour-todoapp-*.rpm store-icon-172.png store-icon-512.png store-cover.png store-screenshot-*.png --clobber
