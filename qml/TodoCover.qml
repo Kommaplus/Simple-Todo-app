@@ -21,7 +21,7 @@ CoverBackground {
 
         Image {
             anchors.horizontalCenter: parent.horizontalCenter
-            source: "file:///usr/share/todoapp/todoapp.png"
+            source: "file:///usr/share/harbour-todoapp/harbour-todoapp.png"
             width: Theme.iconSizeLarge
             height: width
         }
